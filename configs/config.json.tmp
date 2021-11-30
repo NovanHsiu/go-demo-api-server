@@ -1,0 +1,21 @@
+{
+    "common":{
+        "port":"3000",
+        "ssl_port":"3001",
+        "tls_crt_path":"./ssl/server.crt",
+        "tls_key_path":"./ssl/server.key"
+    },
+    "file":{
+        "static_file_dir":"./files"
+    },
+    "db":{
+        "type":"sqlite",
+        "host":"10.11.101.156",
+        "port":"5431",
+        "dbname":"go_demo_api_server",
+        "user":"postgres",
+        "passwd":"qazxsw321",
+        "sslmode":"disable",
+        "timezone":"Asia/Taipei"
+    }
+}

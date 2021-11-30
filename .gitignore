@@ -1,0 +1,15 @@
+logs/
+__debug_bin
+*.exe
+*.log
+build/
+testing/
+files/
+*.db
+*.zip
+ssl/*.key
+ssl/*.crt
+ssl/*.csr
+tmp/
+configs/*.json
+.vscode/

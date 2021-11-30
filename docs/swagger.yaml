@@ -1,0 +1,436 @@
+basePath: /api
+definitions:
+  models.UserResponse:
+    properties:
+      account:
+        example: admin
+        type: string
+      email:
+        example: admin@testmail.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 管理者
+        type: string
+      userRole:
+        $ref: '#/definitions/models.UserRole'
+    type: object
+  models.UserRole:
+    properties:
+      code:
+        example: 1
+        type: integer
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 管理者
+        type: string
+      permission:
+        example: '{}'
+        type: string
+    type: object
+  parameters.AddUser:
+    properties:
+      account:
+        example: normal_user
+        type: string
+      email:
+        example: normal_user@testmail.com
+        type: string
+      name:
+        example: 普通的使用者
+        type: string
+      password:
+        example: normalguy123
+        type: string
+      password2:
+        example: normalguy123
+        type: string
+      userRoleName:
+        enum:
+        - 管理者
+        - 一般使用者
+        type: string
+    required:
+    - account
+    - email
+    - name
+    - password
+    - password2
+    - userRoleName
+    type: object
+  parameters.Login:
+    properties:
+      account:
+        example: admin
+        type: string
+      password:
+        example: admin
+        type: string
+    required:
+    - account
+    - password
+    type: object
+  parameters.ModifyPersonalProfile:
+    properties:
+      email:
+        example: daming_wang@testmail.com
+        type: string
+      name:
+        example: 王大明
+        type: string
+    type: object
+  parameters.ModifyUser:
+    properties:
+      email:
+        example: daming_wang@testmail.com
+        type: string
+      name:
+        example: 王大明
+        type: string
+      userRoleName:
+        enum:
+        - 管理者
+        - 一般使用者
+        type: string
+    type: object
+  parameters.ModifyUserPassword:
+    properties:
+      password:
+        type: string
+      password2:
+        type: string
+    required:
+    - password
+    - password2
+    type: object
+  utils.JSONResultData:
+    properties:
+      data:
+        type: object
+      error_code:
+        example: 20001
+        type: integer
+      error_message:
+        example: ok
+        type: string
+    type: object
+  utils.JSONResultDataList:
+    properties:
+      data:
+        type: object
+      error_code:
+        example: 20001
+        type: integer
+      error_message:
+        example: ok
+        type: string
+      pages:
+        example: 10
+        type: integer
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: huey_yu@acebiotek.com
+    name: API Support
+  description: |-
+    ## 摘要
+    可用來做為 GO API Server 教學展示或 API 服務基礎模板
+    ## Swagger API 認證
+    以 **[POST] /users/login** API 取得token，點選文件頁面右側 Authorize 按鈕輸入token 作為Value儲存認證
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Go Demo API Server
+  version: 1.0.0
+paths:
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: 取得使用者資料清單，不輸入過濾參數則回傳所有用戶資料。
+      parameters:
+      - description: 使用者帳號
+        in: query
+        name: account
+        type: string
+      - description: 使用者電子郵件
+        in: query
+        name: email
+        type: string
+      - description: 使用者名稱
+        in: query
+        name: name
+        type: string
+      - description: 排序，預設 `desc`
+        enum:
+        - desc
+        - asc
+        in: query
+        name: order
+        type: string
+      - description: 排序欄位
+        enum:
+        - account
+        - name
+        - userRoleName
+        - email
+        in: query
+        name: orderBy
+        type: string
+      - description: 頁碼
+        in: query
+        name: pageNumber
+        type: integer
+      - description: 每頁資料比數
+        in: query
+        name: pageSize
+        type: integer
+      - description: 使用者角色名稱
+        in: query
+        name: userRoleName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSONResultDataList'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.UserResponse'
+                  type: array
+              type: object
+      summary: 取得使用者資料清單
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 新增使用者資料
+        in: body
+        name: addUserData
+        required: true
+        schema:
+          $ref: '#/definitions/parameters.AddUser'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: successful operation
+          schema:
+            $ref: '#/definitions/utils.JSONResultData'
+      summary: 新增使用者
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 使用者ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content data
+          schema:
+            type: string
+      summary: 刪除使用者
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 使用者ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSONResultData'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+      summary: 取得使用者資料
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 使用者ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 修改使用者資料
+        in: body
+        name: modifyUserData
+        required: true
+        schema:
+          $ref: '#/definitions/parameters.ModifyUser'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content data
+          schema:
+            type: string
+      summary: 修改使用者資料
+      tags:
+      - users
+  /users/{id}/password:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 使用者ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 修改使用者密碼資料
+        in: body
+        name: modifyUserPassword
+        required: true
+        schema:
+          $ref: '#/definitions/parameters.ModifyUserPassword'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content data
+          schema:
+            type: string
+      summary: 修改使用者密碼
+      tags:
+      - users
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 登入資料
+        in: body
+        name: loginData
+        required: true
+        schema:
+          $ref: '#/definitions/parameters.Login'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: successful operation
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSONResultData'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+      summary: 登入使用者帳號
+      tags:
+      - users
+  /users/logout:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content data
+          schema:
+            type: string
+      summary: 登出使用者帳號
+      tags:
+      - users
+  /users/personalProfile:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.JSONResultData'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+      summary: 取得使用者個人資料
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 修改使用者個人資料
+        in: body
+        name: modifyPersonalProfile
+        required: true
+        schema:
+          $ref: '#/definitions/parameters.ModifyPersonalProfile'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content data
+          schema:
+            type: string
+      summary: 修改使用者個人資料
+      tags:
+      - users
+  /users/personalProfile/password:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 修改使用者個人密碼資料
+        in: body
+        name: modifyUserPassword
+        required: true
+        schema:
+          $ref: '#/definitions/parameters.ModifyUserPassword'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content data
+          schema:
+            type: string
+      summary: 修改使用者個人密碼
+      tags:
+      - users
+schemes:
+- http
+- https
+swagger: "2.0"
+tags:
+- description: 使用者
+  name: users
