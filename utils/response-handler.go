@@ -1,8 +1,8 @@
 package utils
 
 type JSONResult struct {
-	ErrorCode    int    `json:"error_code" example:"20001"`
-	ErrorMessage string `json:"error_message" example:"ok"`
+	Code    int    `json:"code" example:"20001"`
+	Message string `json:"message" example:"ok"`
 }
 
 type JSONResultData struct {
@@ -17,7 +17,7 @@ type JSONResultDataList struct {
 }
 
 // GetResponseObject get object for response
-// errorCode:
+// code:
 // 20001: 請求成功
 // 20101: 創建成功
 // 20401: 無內容 (通常為更新或刪除請求回傳結果)
@@ -28,28 +28,28 @@ type JSONResultDataList struct {
 // 40301: 無權限訪問
 // 50001: 未特別分類的伺服器內部錯誤
 // 50002: 伺服器資料庫錯誤
-func GetResponseObject(errorCode int, errorMessage string) JSONResult {
+func GetResponseObject(code int, message string) JSONResult {
 	return JSONResult{
-		ErrorCode:    errorCode,
-		ErrorMessage: errorMessage,
+		Code:    code,
+		Message: message,
 	}
 }
 
-func GetResponseObjectData(errorCode int, errorMessage string, data interface{}) JSONResultData {
+func GetResponseObjectData(code int, message string, data interface{}) JSONResultData {
 	result := JSONResultData{
 		Data: data,
 	}
-	result.ErrorCode = errorCode
-	result.ErrorMessage = errorMessage
+	result.Code = code
+	result.Message = message
 	return result
 }
 
-func GetResponseObjectDataList(errorCode int, errorMessage string, data interface{}, pages int) JSONResultDataList {
+func GetResponseObjectDataList(code int, message string, data interface{}, pages int) JSONResultDataList {
 	result := JSONResultData{
 		Data: data,
 	}
-	result.ErrorCode = errorCode
-	result.ErrorMessage = errorMessage
+	result.Code = code
+	result.Message = message
 	return JSONResultDataList{
 		JSONResultData: result,
 		Pages:          pages,

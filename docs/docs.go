@@ -633,7 +633,7 @@ var doc = `{
                 "data": {
                     "type": "object"
                 },
-                "error_code": {
+                "code": {
                     "type": "integer",
                     "example": 20001
                 },
@@ -649,7 +649,7 @@ var doc = `{
                 "data": {
                     "type": "object"
                 },
-                "error_code": {
+                "code": {
                     "type": "integer",
                     "example": 20001
                 },

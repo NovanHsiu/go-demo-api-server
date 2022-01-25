@@ -13,3 +13,5 @@ ssl/*.csr
 tmp/
 configs/*.json
 .vscode/
+docs/swagger.json
+docs/swagger.yaml
