@@ -35,15 +35,15 @@ type ModifyUserPassword struct {
 type GetUserList struct {
 	Page
 	// 使用者帳號
-	Account string `form:"account"`
+	Account string `json:"account"`
 	// 使用者名稱
-	Name string `form:"name"`
+	Name string `json:"name"`
 	// 使用者角色名稱
-	UserRoleName string `form:"userRoleName"`
+	UserRoleName string `json:"userRoleName"`
 	// 使用者電子郵件
-	Email string `form:"email"`
+	Email string `json:"email"`
 	// 排序欄位
-	OrderBy string `form:"orderBy" enums:"account,name,email"`
+	OrderBy string `json:"orderBy" enums:"account,name,email"`
 }
 
 type AddUser struct {
