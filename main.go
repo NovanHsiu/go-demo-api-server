@@ -38,16 +38,16 @@ func main() {
 	dbLauncher.CreateDefaultTable(db)
 	// set route
 	port := os.Getenv("PORT")
-	sslport := config.Common["ssl_port"]
+	sslport := config.Common.SslPort
 	if len(port) == 0 {
-		port = config.Common["port"]
+		port = config.Common.Port
 	}
 	routeEng := routeLauncher.GetRoutingEngine(db, config)
 	// run routing enigine
-	if config.Common["tls_crt_path"] != "" && config.Common["tls_key_path"] != "" {
+	if config.Common.TlsCrtPath != "" && config.Common.TlsKeyPath != "" {
 		// https
-		if _, err := os.Stat(config.Common["tls_crt_path"]); !os.IsNotExist(err) {
-			go routeEng.RunTLS(":"+sslport, config.Common["tls_crt_path"], config.Common["tls_key_path"])
+		if _, err := os.Stat(config.Common.TlsCrtPath); !os.IsNotExist(err) {
+			go routeEng.RunTLS(":"+sslport, config.Common.TlsCrtPath, config.Common.TlsKeyPath)
 		}
 	}
 	routeEng.Run(":" + port)

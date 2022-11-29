@@ -1,46 +1,46 @@
 package utils
 
 import (
-	"fmt"
+	"encoding/json"
+	"os"
 )
 
-// Config parameters name mapping to config.toml must be capitalize
+type ConfigCommon struct {
+	Port       string `json:"port"`
+	SslPort    string `json:"ssl_port"`
+	TlsCrtPath string `json:"tls_crt_path"`
+	TlsKeyPath string `json:"tls_key_path"`
+}
+
+type ConfigFile struct {
+	StaticFileDir string `json:"static_file_dir"`
+}
+
+type ConfigDB struct {
+	Type     string `json:"type"`
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	Dbname   string `json:"dbname"`
+	User     string `json:"user"`
+	Passwd   string `json:"passwd"`
+	Sslmode  string `json:"sslmode"`
+	Timezone string `json:"timezone"`
+}
+
+// Config parameters name mapping to config.json must be capitalize
 type Config struct {
-	File   map[string]string
-	Common map[string]string
-	DB     map[string]string
+	File   ConfigFile
+	Common ConfigCommon
+	DB     ConfigDB
 }
 
 // GetConfig get config by viper
 func GetConfig() Config {
-	var config Config
-	jsonMap, err := ReadJSONConfig("./configs/config.json")
+	config := Config{}
+	dataByte, err := os.ReadFile(GetExecutionDir() + "/configs/config.json")
 	if err != nil {
-		panic(fmt.Errorf("read configs/config.json error: %s", err))
+		panic(err)
 	}
-	// reset sub config type
-	reqItemList := []string{"common", "db", "file"}
-	for _, item := range reqItemList {
-		if jsonMap[item] != nil {
-			subConfig := jsonMap[item].(map[string]interface{})
-			newSubConfig := make(map[string]string)
-			for key := range subConfig {
-				newSubConfig[key] = subConfig[key].(string)
-			}
-			jsonMap[item] = newSubConfig
-		} else {
-			if HasString(reqItemList, item) {
-				panic("config.json missing require key: " + item)
-			} else {
-				jsonMap[item] = make(map[string]string)
-			}
-		}
-	}
-	// set form config
-	config = Config{
-		Common: jsonMap[reqItemList[0]].(map[string]string),
-		DB:     jsonMap[reqItemList[1]].(map[string]string),
-		File:   jsonMap[reqItemList[2]].(map[string]string),
-	}
+	json.Unmarshal(dataByte, &config)
 	return config
 }

@@ -14,17 +14,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewDB(dbConfig map[string]string) (*gorm.DB, error) {
-	host := dbConfig["host"]
-	dbname := dbConfig["dbname"]
-	port := dbConfig["port"]
-	sslmode := dbConfig["sslmode"]
-	user := dbConfig["user"]
-	dbType := strings.ToLower(dbConfig["type"])
-	password := dbConfig["passwd"]
+func NewDB(dbConfig utils.ConfigDB) (*gorm.DB, error) {
+	host := dbConfig.Host
+	dbname := dbConfig.Dbname
+	port := dbConfig.Port
+	sslmode := dbConfig.Sslmode
+	user := dbConfig.User
+	dbType := strings.ToLower(dbConfig.Type)
+	password := dbConfig.Passwd
 	timeZone := "Asia/Taipei"
-	if dbConfig["timezone"] != "" {
-		timeZone = dbConfig["timezone"]
+	if dbConfig.Timezone != "" {
+		timeZone = dbConfig.Timezone
 	}
 	if dbType == "sqlite" {
 		return gorm.Open(sqlite.Open("local.db"), &gorm.Config{})
@@ -33,8 +33,8 @@ func NewDB(dbConfig map[string]string) (*gorm.DB, error) {
 		dsn := user + ":" + password + "@" + fmt.Sprintf("(%s:%s)/%s", host, port, dbname) + "?charset=utf8mb4&parseTime=True&loc=Local"
 		return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	} else if dbType == "postgres" {
-		host := dbConfig["host"]
-		dbname := dbConfig["dbname"]
+		host := dbConfig.Host
+		dbname := dbConfig.Dbname
 		// default port "5432"
 		dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s TimeZone=%s", host, port, user, dbname, password, sslmode, timeZone)
 		return gorm.Open(postgres.Open(dsn), &gorm.Config{})

@@ -3,6 +3,7 @@ package route
 import (
 	"os"
 
+	_ "github.com/NovanHsiu/go-demo-api-server/docs"
 	"github.com/NovanHsiu/go-demo-api-server/routes"
 	"github.com/NovanHsiu/go-demo-api-server/utils"
 	"github.com/gin-gonic/contrib/cors"
@@ -29,8 +30,8 @@ func GetRoutingEngine(db *gorm.DB, config utils.Config) *gin.Engine {
 	// set middleware
 
 	// set route
-	os.Mkdir(utils.ExecutionDir()+"/"+config.File["static_file_dir"], os.ModePerm)
-	eng.Use(static.Serve("/static", static.LocalFile(config.File["static_file_dir"], true)))
+	os.Mkdir(utils.GetExecutionDir()+"/"+config.File.StaticFileDir, os.ModePerm)
+	eng.Use(static.Serve("/static", static.LocalFile(config.File.StaticFileDir, true)))
 	apiGroup := eng.Group("/api")
 	routes.SetUserGroup(db, config, apiGroup)
 	return eng

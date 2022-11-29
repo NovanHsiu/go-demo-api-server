@@ -108,7 +108,7 @@ func GetMimeType(contentType string) string {
 	return contentType[strings.Index(contentType, "[")+1 : strings.Index(contentType, "]")]
 }
 
-func ExecutionDir() string {
+func GetExecutionDir() string {
 	exdir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	return exdir
 }
@@ -265,7 +265,7 @@ func IsImage(filename string) bool {
 }
 
 func ReadJSONConfig(path string) (map[string]interface{}, error) {
-	dir := ExecutionDir()
+	dir := GetExecutionDir()
 	data, err := ioutil.ReadFile(dir + "/" + path)
 	if err != nil {
 		return nil, err
