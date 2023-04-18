@@ -3,7 +3,6 @@ __debug_bin
 *.exe
 *.log
 build/
-testing/
 files/
 *.db
 *.zip

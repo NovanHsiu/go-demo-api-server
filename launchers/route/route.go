@@ -15,8 +15,9 @@ import (
 )
 
 func GetRoutingEngine(db *gorm.DB, config utils.Config) *gin.Engine {
-	eng := gin.New()
+	eng := gin.Default()
 	eng.Use(gin.Recovery())
+
 	// allow CORS
 	cconfig := cors.DefaultConfig()
 	cconfig.AllowAllOrigins = true
@@ -33,6 +34,7 @@ func GetRoutingEngine(db *gorm.DB, config utils.Config) *gin.Engine {
 	os.Mkdir(utils.GetExecutionDir()+"/"+config.File.StaticFileDir, os.ModePerm)
 	eng.Use(static.Serve("/static", static.LocalFile(config.File.StaticFileDir, true)))
 	apiGroup := eng.Group("/api")
+	// /users
 	routes.SetUserGroup(db, config, apiGroup)
 	return eng
 }
