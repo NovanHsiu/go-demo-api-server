@@ -57,6 +57,7 @@ func (uc *UserController) LogIn(c *gin.Context) {
 // @Tags users
 // @Accept  json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 204 {string} string "no content"
 // @Router /users/logout [delete]
 // LogOut logout user's account
@@ -70,6 +71,7 @@ func (uc *UserController) LogOut(c *gin.Context) {
 // @Tags users
 // @Accept  json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {object} utils.JSONResultData{data=models.UserResponse} "ok"
 // @Router /users/personalProfile [get]
 // GetProfile get user's profile
@@ -84,6 +86,7 @@ func (uc *UserController) GetUserProfile(c *gin.Context) {
 // @Tags users
 // @Accept  json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param addUserData body parameters.AddUser true "新增使用者資料"
 // @Success 201 {object} utils.JSONResultData "created"
 // @Router  /users [post]
@@ -129,6 +132,7 @@ func (uc *UserController) AddUser(c *gin.Context) {
 // @Tags users
 // @Accept  json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param getUserList query parameters.GetUserList true "取得使用者過濾資訊"
 // @Success 200 {object} utils.JSONResultDataList{data=[]models.UserResponseListData} "successful operation"
 // @Router /users [get]
@@ -177,6 +181,7 @@ func (uc *UserController) GetUserList(c *gin.Context) {
 // @Tags users
 // @Accept  json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {object} utils.JSONResultData{data=models.UserResponseListData} "ok"
 // @Param id path int true "使用者ID"
 // @Router /users/{id} [get]
@@ -194,6 +199,7 @@ func (uc *UserController) GetUser(c *gin.Context) {
 // @Tags users
 // @Accept  json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path int true "使用者ID"
 // @Param modifyUserData body parameters.ModifyUser true "修改使用者資料"
 // @Success 204 {string} string "no content"
@@ -223,6 +229,7 @@ func (uc *UserController) ModifyUser(c *gin.Context) {
 // @Tags users
 // @Accept  json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path int true "使用者ID"
 // @Param modifyUserPassword body parameters.ModifyUserPassword true "修改使用者密碼資料"
 // @Success 204 {string} string "no content"
@@ -245,6 +252,7 @@ func (uc *UserController) ModifyUserPassword(c *gin.Context) {
 // @Tags users
 // @Accept  json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path int true "使用者ID"
 // @Success 204 {string} string "no content"
 // @Router /users/{id} [delete]
@@ -261,6 +269,7 @@ func (uc *UserController) DeleteUser(c *gin.Context) {
 // @Tags users
 // @Accept  json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param modifyPersonalProfile body parameters.ModifyPersonalProfile true "修改使用者個人資料"
 // @Success 204 {string} string "no content"
 // @Router /users/personalProfile [put]
@@ -285,6 +294,7 @@ func (uc *UserController) ModifyUserProfile(c *gin.Context) {
 // @Tags users
 // @Accept  json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param modifyUserPassword body parameters.ModifyUserPassword true "修改使用者個人密碼資料"
 // @Success 204 {string} string "no content data"
 // @Router /users/personalProfile/password [put]
