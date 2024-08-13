@@ -25,11 +25,6 @@ import (
 // @BasePath /api
 // @schemes http https
 
-// @securityDefinitions.apikey ApiKeyAuth
-// @type apiKey
-// @name Authorization
-// @in header
-
 // @tag.name users
 // @tag.description 使用者
 func main() {

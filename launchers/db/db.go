@@ -46,7 +46,6 @@ func NewDB(dbConfig utils.ConfigDB) (*gorm.DB, error) {
 func CreateDefaultTable(db *gorm.DB) {
 	db.AutoMigrate(&models.UserRole{})
 	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.UserSession{})
 	// create default user_role
 	count := int64(0)
 	if db.Model(models.UserRole{}).Where("code=?", 1).Count(&count); count == 0 {

@@ -20,22 +20,13 @@ type UserResponseListData struct {
 	UserRole UserRole `json:"userRole"`
 }
 
-type UserResponse struct {
-	UserResponseListData
-	Token string `json:"token" example:""`
-}
-
-func (u *User) GetResponse(token string) UserResponse {
-	uld := UserResponseListData{
+func (u *User) GetResponse() UserResponseListData {
+	return UserResponseListData{
 		ID:       u.ID,
 		Account:  u.Account,
 		Name:     u.Name,
 		Email:    u.Email,
 		UserRole: u.UserRole,
-	}
-	return UserResponse{
-		UserResponseListData: uld,
-		Token:                token,
 	}
 }
 

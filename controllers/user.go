@@ -8,6 +8,7 @@ import (
 	"github.com/NovanHsiu/go-demo-api-server/models"
 	"github.com/NovanHsiu/go-demo-api-server/utils"
 	"github.com/NovanHsiu/go-demo-api-server/utils/constants"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -18,11 +19,12 @@ type UserController struct {
 }
 
 // @Summary 登入使用者帳號
+// @Description 登入使用者帳號，回傳 Header Set-Cookie 帶有登入 Token 資訊
 // @Tags users
 // @Accept  json
 // @Produce json
 // @Param loginData body parameters.Login true "登入資料"
-// @Success 200 {object} utils.JSONResultData{data=models.UserResponse} "ok"
+// @Success 200 {object} utils.JSONResultData{data=models.UserResponseListData} "ok"
 // @Router /users/login [post]
 // LogIn login user's account
 func (uc *UserController) LogIn(c *gin.Context) {
@@ -43,13 +45,14 @@ func (uc *UserController) LogIn(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, utils.GetResponseObject(40002, "password error"))
 		return
 	}
-	token := utils.Cipher.GetJWT(fmt.Sprintf("%d", user.ID))
-	data := user.GetResponse(token)
-	result := utils.GetResponseObjectData(20001, "ok", data)
-	uc.DB.Create(&models.UserSession{
-		Token:  token,
-		UserID: user.ID,
+	session := sessions.Default(c)
+	session.Set("token", fmt.Sprintf("%d", user.ID))
+	session.Options(sessions.Options{
+		MaxAge: 60 * 60 * 24, // expired time 24 hours
 	})
+	session.Save()
+	data := user.GetResponse()
+	result := utils.GetResponseObjectData(20001, "ok", data)
 	c.JSON(http.StatusOK, result)
 }
 
@@ -62,8 +65,9 @@ func (uc *UserController) LogIn(c *gin.Context) {
 // @Router /users/logout [delete]
 // LogOut logout user's account
 func (uc *UserController) LogOut(c *gin.Context) {
-	token := c.GetString("token")
-	uc.DB.Where("token=?", token).Delete(&models.UserSession{})
+	session := sessions.Default(c)
+	session.Delete("token")
+	session.Save()
 	c.JSON(http.StatusNoContent, utils.GetResponseObject(20401, "no content"))
 }
 
@@ -72,14 +76,14 @@ func (uc *UserController) LogOut(c *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {object} utils.JSONResultData{data=models.UserResponse} "ok"
+// @Success 200 {object} utils.JSONResultData{data=models.UserResponseListData} "ok"
 // @Router /users/personalProfile [get]
 // GetProfile get user's profile
 func (uc *UserController) GetUserProfile(c *gin.Context) {
 	userID := c.GetString(constants.UserIDKey)
 	user := models.User{}
 	uc.DB.Where("id=?", userID).Preload("UserRole").Last(&user)
-	c.JSON(http.StatusOK, utils.GetResponseObjectData(20001, "ok", user.GetResponse(c.GetString("token"))))
+	c.JSON(http.StatusOK, utils.GetResponseObjectData(20001, "ok", user.GetResponse()))
 }
 
 // @Summary 新增使用者

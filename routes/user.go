@@ -15,13 +15,13 @@ func SetUserGroup(db *gorm.DB, config utils.Config, apiGroup *gin.RouterGroup) {
 		// no restriction
 		userGroup.POST("/login", user.LogIn)
 		// authorized by token
-		userGroup.Use(middlewares.AuthToken(db))
+		userGroup.Use(middlewares.AuthSessionToken(db))
 		userGroup.DELETE("/logout", user.LogOut)
 		userGroup.GET("/personalProfile", user.GetUserProfile)
 		userGroup.PUT("/personalProfile", user.ModifyUserProfile)
 		userGroup.PUT("/personalProfile/password", user.ModifyUserProfilePassword)
 		// admin only
-		userGroup.Use(middlewares.AuthToken(db)).Use(middlewares.AdminOnly(db))
+		userGroup.Use(middlewares.AuthSessionToken(db)).Use(middlewares.AdminOnly(db))
 		userGroup.POST("/", user.AddUser)
 		userGroup.GET("/", user.GetUserList)
 		userGroup.GET("/:id", user.GetUser)
