@@ -1,4 +1,4 @@
-package models
+package model
 
 type UserRole struct {
 	ID         uint   `json:"id" example:"1"`

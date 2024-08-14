@@ -1,4 +1,4 @@
-package parameters
+package parameter
 
 type Page struct {
 	// 排序，預設 `desc`

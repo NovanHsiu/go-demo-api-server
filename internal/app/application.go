@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	dbLauncher "github.com/NovanHsiu/go-demo-api-server/launchers/db"
-	"github.com/NovanHsiu/go-demo-api-server/utils"
+	adapterGorm "github.com/NovanHsiu/go-demo-api-server/internal/adapter/gorm"
+	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
 	"github.com/patrickmn/go-cache"
 	"gorm.io/gorm"
 )
@@ -17,7 +17,7 @@ type Application struct {
 }
 
 type ApplicationParams struct {
-	Config utils.Config
+	Config common.Config
 }
 
 type ApplicationCache struct {
@@ -26,11 +26,11 @@ type ApplicationCache struct {
 
 func NewApplication(ctx context.Context, params ApplicationParams) (*Application, error) {
 	// set db
-	db, err := dbLauncher.NewDB(params.Config.DB)
+	db, err := adapterGorm.NewDB(params.Config.DB)
 	if err != nil {
 		return nil, err
 	}
-	dbLauncher.CreateDefaultTable(db)
+	adapterGorm.CreateDefaultTable(db)
 	tokenCache := cache.New(10*time.Minute, 20*time.Minute)
 	app := Application{
 		ApplicationParams: params,

@@ -1,4 +1,4 @@
-package parameters
+package parameter
 
 type Login struct {
 	Account  string `binding:"required" json:"account" example:"admin"`

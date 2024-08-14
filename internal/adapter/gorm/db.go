@@ -1,4 +1,4 @@
-package db
+package gorm
 
 import (
 	"errors"
@@ -6,15 +6,15 @@ import (
 	"log"
 	"strings"
 
-	"github.com/NovanHsiu/go-demo-api-server/models"
-	"github.com/NovanHsiu/go-demo-api-server/utils"
+	"github.com/NovanHsiu/go-demo-api-server/internal/adapter/gorm/model"
+	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func NewDB(dbConfig utils.ConfigDB) (*gorm.DB, error) {
+func NewDB(dbConfig common.ConfigDB) (*gorm.DB, error) {
 	host := dbConfig.Host
 	dbname := dbConfig.Dbname
 	port := dbConfig.Port
@@ -44,23 +44,23 @@ func NewDB(dbConfig utils.ConfigDB) (*gorm.DB, error) {
 }
 
 func CreateDefaultTable(db *gorm.DB) {
-	db.AutoMigrate(&models.UserRole{})
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&model.UserRole{})
+	db.AutoMigrate(&model.User{})
 	// create default user_role
 	count := int64(0)
-	if db.Model(models.UserRole{}).Where("code=?", 1).Count(&count); count == 0 {
-		if err := db.Create(&models.DefaultUserRole[0]).Error; err != nil {
+	if db.Model(model.UserRole{}).Where("code=?", 1).Count(&count); count == 0 {
+		if err := db.Create(&model.DefaultUserRole[0]).Error; err != nil {
 			log.Println("create default admin user_role error", err)
 		}
-		if err := db.Create(&models.DefaultUserRole[1]).Error; err != nil {
+		if err := db.Create(&model.DefaultUserRole[1]).Error; err != nil {
 			log.Println("create default regular user_role error", err)
 		}
 	}
 	// create default user
-	if db.Model(models.User{}).Where("account=?", "admin").Count(&count); count == 0 {
-		if err := db.Create(&models.User{
+	if db.Model(model.User{}).Where("account=?", "admin").Count(&count); count == 0 {
+		if err := db.Create(&model.User{
 			Account:    "admin",
-			Password:   utils.Cipher.EncodePassword("admin"),
+			Password:   common.Cipher.EncodePassword("admin"),
 			Name:       "管理者帳號",
 			Email:      "admin@testmail.com",
 			UserRoleID: 1,
@@ -68,10 +68,10 @@ func CreateDefaultTable(db *gorm.DB) {
 			log.Println("create default admin user error", err)
 		}
 	}
-	if db.Model(models.User{}).Where("account=?", "testuser").Count(&count); count == 0 {
-		if err := db.Create(&models.User{
+	if db.Model(model.User{}).Where("account=?", "testuser").Count(&count); count == 0 {
+		if err := db.Create(&model.User{
 			Account:    "testuser",
-			Password:   utils.Cipher.EncodePassword("testuser"),
+			Password:   common.Cipher.EncodePassword("testuser"),
 			Name:       "測試一般使用者",
 			Email:      "testuser@testmail.com",
 			UserRoleID: 2,

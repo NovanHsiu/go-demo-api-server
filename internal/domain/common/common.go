@@ -1,4 +1,4 @@
-package utils
+package common
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	uCipher "github.com/NovanHsiu/go-demo-api-server/utils/cipher"
+	uCipher "github.com/NovanHsiu/go-demo-api-server/internal/domain/cipher"
 )
 
 // TimeLayout used to time.parse

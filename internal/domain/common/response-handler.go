@@ -1,4 +1,4 @@
-package utils
+package common
 
 type JSONResult struct {
 	Code    int    `json:"code" example:"20001"`

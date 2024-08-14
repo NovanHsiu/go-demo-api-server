@@ -6,12 +6,12 @@ import (
 	"os"
 
 	"github.com/NovanHsiu/go-demo-api-server/internal/app"
-	routeLauncher "github.com/NovanHsiu/go-demo-api-server/launchers/route"
-	"github.com/NovanHsiu/go-demo-api-server/utils"
+	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
+	"github.com/NovanHsiu/go-demo-api-server/internal/router"
 )
 
 // @title Go Demo API Server
-// @version 1.1.0
+// @version 1.2.0
 // @description ## 摘要
 // @description 可用來做為 GO API Server 教學展示或 API 服務基礎模板
 // @description ## Swagger API 認證
@@ -32,12 +32,12 @@ import (
 func main() {
 	if len(os.Args) > 1 {
 		if os.Args[1] == "version" {
-			fmt.Println("version 1.1.0")
+			fmt.Println("version 1.2.0")
 			return
 		}
 	}
 	//log.SetOutput(os.Stdout)
-	config := utils.GetConfig()
+	config := common.GetConfig()
 	app, err := app.NewApplication(context.Background(), app.ApplicationParams{
 		Config: config,
 	})
@@ -50,7 +50,7 @@ func main() {
 	if len(port) == 0 {
 		port = config.Common.Port
 	}
-	routeEng := routeLauncher.GetRoutingEngine(app)
+	routeEng := router.GetRouterEngine(app)
 	// run routing enigine
 	if config.Common.TlsCrtPath != "" && config.Common.TlsKeyPath != "" {
 		// https
