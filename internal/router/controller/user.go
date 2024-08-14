@@ -170,6 +170,12 @@ func (uc *UserController) GetUserList(c *gin.Context) {
 	}
 	// set pagination
 	userList := []model.User{}
+	if params.PageNumber == 0 {
+		params.PageNumber = 1
+	}
+	if params.PageSize == 0 {
+		params.PageSize = 10
+	}
 	db.Offset(params.Page.GetOffset()).Limit(params.PageSize).Preload("UserRole").Find(&userList)
 	data := []model.UserResponseListData{}
 	for _, user := range userList {
