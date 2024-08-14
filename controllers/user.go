@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/NovanHsiu/go-demo-api-server/controllers/parameters"
+	"github.com/NovanHsiu/go-demo-api-server/internal/app"
 	"github.com/NovanHsiu/go-demo-api-server/models"
 	"github.com/NovanHsiu/go-demo-api-server/utils"
 	"github.com/NovanHsiu/go-demo-api-server/utils/constants"
@@ -14,8 +15,7 @@ import (
 )
 
 type UserController struct {
-	DB     *gorm.DB
-	Config utils.Config
+	App *app.Application
 }
 
 // @Summary 登入使用者帳號
@@ -34,7 +34,7 @@ func (uc *UserController) LogIn(c *gin.Context) {
 		return
 	}
 	user := models.User{}
-	if err := uc.DB.Where("account=?", params.Account).Last(&user).Error; err != nil {
+	if err := uc.App.DB.Where("account=?", params.Account).Last(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, utils.GetResponseObject(50002, err.Error()))
 		return
 	}
@@ -82,7 +82,7 @@ func (uc *UserController) LogOut(c *gin.Context) {
 func (uc *UserController) GetUserProfile(c *gin.Context) {
 	userID := c.GetString(constants.UserIDKey)
 	user := models.User{}
-	uc.DB.Where("id=?", userID).Preload("UserRole").Last(&user)
+	uc.App.DB.Where("id=?", userID).Preload("UserRole").Last(&user)
 	c.JSON(http.StatusOK, utils.GetResponseObjectData(20001, "ok", user.GetResponse()))
 }
 
@@ -108,17 +108,17 @@ func (uc *UserController) AddUser(c *gin.Context) {
 	}
 	// check account exists or not
 	var count int64
-	if uc.DB.Model(&models.User{}).Where("account=?", params.Account).Count(&count); count > 0 {
+	if uc.App.DB.Model(&models.User{}).Where("account=?", params.Account).Count(&count); count > 0 {
 		c.JSON(http.StatusBadRequest, utils.GetResponseObject(40003, "this account is existed"))
 		return
 	}
 	// check user role
 	userRole := models.UserRole{}
-	if uc.DB.Where("name=?", params.UserRoleName).Last(&userRole); userRole.ID == 0 {
+	if uc.App.DB.Where("name=?", params.UserRoleName).Last(&userRole); userRole.ID == 0 {
 		c.JSON(http.StatusBadRequest, utils.GetResponseObject(40002, "userRoleName not found"))
 		return
 	}
-	if err := uc.DB.Create(&models.User{
+	if err := uc.App.DB.Create(&models.User{
 		Account:    params.Account,
 		Password:   utils.Cipher.EncodePassword(params.Password),
 		Name:       params.Name,
@@ -153,7 +153,7 @@ func (uc *UserController) GetUserList(c *gin.Context) {
 		"name":    params.Name,
 		"email":   params.Email,
 	}
-	db := uc.DB
+	db := uc.App.DB
 	for key, value := range filterMap {
 		if value != "" {
 			db = db.Where(key+" like ?", "%"+value+"%")
@@ -192,7 +192,7 @@ func (uc *UserController) GetUserList(c *gin.Context) {
 // GetUser get specificed user's profile
 func (uc *UserController) GetUser(c *gin.Context) {
 	user := models.User{}
-	if uc.DB.Where("id=?", c.Param("id")).Preload("UserRole").Last(&user); user.ID == 0 {
+	if uc.App.DB.Where("id=?", c.Param("id")).Preload("UserRole").Last(&user); user.ID == 0 {
 		c.JSON(http.StatusBadRequest, utils.GetResponseObject(40002, "user not found"))
 		return
 	}
@@ -219,13 +219,13 @@ func (uc *UserController) ModifyUser(c *gin.Context) {
 	updateMap := params.ModifyPersonalProfile.GetUpdateMap()
 	userRole := models.UserRole{}
 	if params.UserRoleName != "" {
-		if uc.DB.Where("name=?", params.UserRoleName).Last(&userRole); userRole.ID == 0 {
+		if uc.App.DB.Where("name=?", params.UserRoleName).Last(&userRole); userRole.ID == 0 {
 			c.JSON(http.StatusBadRequest, utils.GetResponseObject(40002, fmt.Sprintf("user_role.name='%s' not found", params.UserRoleName)))
 			return
 		}
 		updateMap["user_role_id"] = userRole.ID
 	}
-	uc.DB.Model(&models.User{}).Where("id=?", c.Param("id")).Updates(updateMap)
+	uc.App.DB.Model(&models.User{}).Where("id=?", c.Param("id")).Updates(updateMap)
 	c.JSON(http.StatusNoContent, utils.GetResponseObject(20401, "no content"))
 }
 
@@ -245,7 +245,7 @@ func (uc *UserController) ModifyUserPassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	if statusCode, errResult := modifyPassword(uc.DB, params, c.Param("id")); statusCode != http.StatusOK {
+	if statusCode, errResult := modifyPassword(uc.App.DB, params, c.Param("id")); statusCode != http.StatusOK {
 		c.JSON(statusCode, errResult)
 		return
 	}
@@ -262,7 +262,7 @@ func (uc *UserController) ModifyUserPassword(c *gin.Context) {
 // @Router /users/{id} [delete]
 // DeleteUser delete specificed user
 func (uc *UserController) DeleteUser(c *gin.Context) {
-	if err := uc.DB.Where("id=?", c.Param("id")).Delete(&models.User{}).Error; err != nil {
+	if err := uc.App.DB.Where("id=?", c.Param("id")).Delete(&models.User{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, utils.GetResponseObject(50002, err.Error()))
 		return
 	}
@@ -287,7 +287,7 @@ func (uc *UserController) ModifyUserProfile(c *gin.Context) {
 	userID := c.GetString(constants.UserIDKey)
 	// set update map
 	updateMap := params.GetUpdateMap()
-	if err := uc.DB.Model(&models.User{}).Where("id=?", userID).Updates(updateMap).Error; err != nil {
+	if err := uc.App.DB.Model(&models.User{}).Where("id=?", userID).Updates(updateMap).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, utils.GetResponseObject(50002, err.Error()))
 		return
 	}
@@ -310,7 +310,7 @@ func (uc *UserController) ModifyUserProfilePassword(c *gin.Context) {
 		return
 	}
 	userID := c.GetString(constants.UserIDKey)
-	if statusCode, errResult := modifyPassword(uc.DB, params, userID); statusCode != http.StatusOK {
+	if statusCode, errResult := modifyPassword(uc.App.DB, params, userID); statusCode != http.StatusOK {
 		c.JSON(statusCode, errResult)
 		return
 	}

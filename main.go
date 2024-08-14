@@ -1,15 +1,17 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"os"
 
-	dbLauncher "github.com/NovanHsiu/go-demo-api-server/launchers/db"
+	"github.com/NovanHsiu/go-demo-api-server/internal/app"
 	routeLauncher "github.com/NovanHsiu/go-demo-api-server/launchers/route"
 	"github.com/NovanHsiu/go-demo-api-server/utils"
 )
 
 // @title Go Demo API Server
-// @version 1.0.0
+// @version 1.1.0
 // @description ## 摘要
 // @description 可用來做為 GO API Server 教學展示或 API 服務基礎模板
 // @description ## Swagger API 認證
@@ -28,21 +30,27 @@ import (
 // @tag.name users
 // @tag.description 使用者
 func main() {
+	if len(os.Args) > 1 {
+		if os.Args[1] == "version" {
+			fmt.Println("version 1.1.0")
+			return
+		}
+	}
 	//log.SetOutput(os.Stdout)
 	config := utils.GetConfig()
-	// set db
-	db, err := dbLauncher.NewDB(config.DB)
+	app, err := app.NewApplication(context.Background(), app.ApplicationParams{
+		Config: config,
+	})
 	if err != nil {
 		panic(err)
 	}
-	dbLauncher.CreateDefaultTable(db)
 	// set route
 	port := os.Getenv("PORT")
 	sslport := config.Common.SslPort
 	if len(port) == 0 {
 		port = config.Common.Port
 	}
-	routeEng := routeLauncher.GetRoutingEngine(db, config)
+	routeEng := routeLauncher.GetRoutingEngine(app)
 	// run routing enigine
 	if config.Common.TlsCrtPath != "" && config.Common.TlsKeyPath != "" {
 		// https

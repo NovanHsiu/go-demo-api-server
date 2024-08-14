@@ -7,6 +7,7 @@ require (
 	github.com/gin-contrib/sessions v1.0.1
 	github.com/gin-gonic/contrib v0.0.0-20240508051311-c1c6bf0061b0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/swaggo/gin-swagger v1.3.3
 	github.com/swaggo/swag v1.7.4
 	golang.org/x/crypto v0.22.0

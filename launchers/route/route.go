@@ -4,6 +4,7 @@ import (
 	"os"
 
 	_ "github.com/NovanHsiu/go-demo-api-server/docs"
+	"github.com/NovanHsiu/go-demo-api-server/internal/app"
 	"github.com/NovanHsiu/go-demo-api-server/routes"
 	"github.com/NovanHsiu/go-demo-api-server/utils"
 	"github.com/gin-contrib/sessions"
@@ -13,10 +14,9 @@ import (
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
-	"gorm.io/gorm"
 )
 
-func GetRoutingEngine(db *gorm.DB, config utils.Config) *gin.Engine {
+func GetRoutingEngine(app *app.Application) *gin.Engine {
 	eng := gin.Default()
 	eng.Use(gin.Recovery())
 	// allow CORS
@@ -26,7 +26,7 @@ func GetRoutingEngine(db *gorm.DB, config utils.Config) *gin.Engine {
 	cconfig.AllowedHeaders = append(cconfig.AllowedHeaders, []string{"Authorization"}...)
 	eng.Use(cors.New(cconfig))
 	// "yoursecretpassowrd" is password for encoding
-	store := gormsessions.NewStore(db, true, []byte("yoursecretpassowrd"))
+	store := gormsessions.NewStore(app.DB, true, []byte("yoursecretpassowrd"))
 	// set session middleware "mysession" is session and cookie name
 	// store is storage engine, we can use redis or another db to store session
 	eng.Use(sessions.Sessions("api-server-session", store))
@@ -37,10 +37,11 @@ func GetRoutingEngine(db *gorm.DB, config utils.Config) *gin.Engine {
 	// set middleware
 
 	// set route
+	config := app.ApplicationParams.Config
 	os.Mkdir(utils.GetExecutionDir()+"/"+config.File.StaticFileDir, os.ModePerm)
 	eng.Use(static.Serve("/static", static.LocalFile(config.File.StaticFileDir, true)))
 	apiGroup := eng.Group("/api")
 	// /users
-	routes.SetUserGroup(db, config, apiGroup)
+	routes.SetUserGroup(app, apiGroup)
 	return eng
 }
