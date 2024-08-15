@@ -11,11 +11,11 @@ import (
 )
 
 // @title Go Demo API Server
-// @version 1.2.3
+// @version 1.2.4
 // @description ## 摘要
 // @description 可用來做為 GO API Server 教學展示或 API 服務基礎模板
 // @description ## Swagger API 認證
-// @description 以 `[POST] /users/login` API 取得token，點選文件頁面右側 Authorize 按鈕輸入token 作為Value儲存認證
+// @description 以 `[POST] /users/login` 登入會進行 Session 認證，瀏覽器會自行存取 Cookie 並使用 Session Token。
 
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
