@@ -9,6 +9,7 @@ import (
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/constant"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/parameter"
+	"github.com/NovanHsiu/go-demo-api-server/internal/domain/response"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -24,7 +25,7 @@ type UserController struct {
 // @Accept  json
 // @Produce json
 // @Param loginData body parameter.Login true "登入資料"
-// @Success 200 {object} common.JSONResultData{data=model.UserResponseListData} "ok"
+// @Success 200 {object} common.JSONResultData{data=response.UserResponseListItem} "ok"
 // @Router /users/login [post]
 // LogIn login user's account
 func (uc *UserController) LogIn(c *gin.Context) {
@@ -34,7 +35,7 @@ func (uc *UserController) LogIn(c *gin.Context) {
 		return
 	}
 	user := model.User{}
-	if err := uc.App.DB.Where("account=?", params.Account).Last(&user).Error; err != nil {
+	if err := uc.App.DB.Where("account=?", params.Account).Preload("UserRole").Last(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, common.GetResponseObject(50002, err.Error()))
 		return
 	}
@@ -76,7 +77,7 @@ func (uc *UserController) LogOut(c *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {object} common.JSONResultData{data=model.UserResponseListData} "ok"
+// @Success 200 {object} common.JSONResultData{data=response.UserResponseListItem} "ok"
 // @Router /users/personalProfile [get]
 // GetProfile get user's profile
 func (uc *UserController) GetUserProfile(c *gin.Context) {
@@ -138,7 +139,7 @@ func (uc *UserController) AddUser(c *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param getUserList query parameter.GetUserList true "取得使用者過濾資訊"
-// @Success 200 {object} common.JSONResultDataList{data=[]model.UserResponseListData} "successful operation"
+// @Success 200 {object} common.JSONResultDataList{data=[]response.UserResponseListItem} "successful operation"
 // @Router /users [get]
 // GetUserList get a list of user's data
 func (uc *UserController) GetUserList(c *gin.Context) {
@@ -177,9 +178,9 @@ func (uc *UserController) GetUserList(c *gin.Context) {
 		params.PageSize = 10
 	}
 	db.Offset(params.Page.GetOffset()).Limit(params.PageSize).Preload("UserRole").Find(&userList)
-	data := []model.UserResponseListData{}
+	data := []response.UserResponseListItem{}
 	for _, user := range userList {
-		data = append(data, user.GetUserResponseListData())
+		data = append(data, user.GetResponse())
 	}
 	// get pages
 	var count int64
@@ -192,7 +193,7 @@ func (uc *UserController) GetUserList(c *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {object} common.JSONResultData{data=model.UserResponseListData} "ok"
+// @Success 200 {object} common.JSONResultData{data=response.UserResponseListItem} "ok"
 // @Param id path int true "使用者ID"
 // @Router /users/{id} [get]
 // GetUser get specificed user's profile
@@ -202,7 +203,7 @@ func (uc *UserController) GetUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, common.GetResponseObject(40002, "user not found"))
 		return
 	}
-	c.JSON(http.StatusOK, common.GetResponseObjectData(20001, "ok", user.GetUserResponseListData()))
+	c.JSON(http.StatusOK, common.GetResponseObjectData(20001, "ok", user.GetResponse()))
 }
 
 // @Summary 修改使用者資料
