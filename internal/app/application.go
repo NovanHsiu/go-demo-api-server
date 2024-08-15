@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	adapterGorm "github.com/NovanHsiu/go-demo-api-server/internal/adapter/gorm"
+	adapterGorm "github.com/NovanHsiu/go-demo-api-server/internal/adapter/repository/gorm"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
 	"github.com/patrickmn/go-cache"
 	"gorm.io/gorm"

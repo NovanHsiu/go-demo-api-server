@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/NovanHsiu/go-demo-api-server/internal/adapter/gorm/model"
+	"github.com/NovanHsiu/go-demo-api-server/internal/adapter/repository/gorm/model"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"

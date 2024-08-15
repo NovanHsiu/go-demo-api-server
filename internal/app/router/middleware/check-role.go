@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/NovanHsiu/go-demo-api-server/internal/adapter/gorm/model"
+	"github.com/NovanHsiu/go-demo-api-server/internal/adapter/repository/gorm/model"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/constant"
 	"github.com/gin-gonic/gin"

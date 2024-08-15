@@ -11,7 +11,7 @@ import (
 )
 
 // @title Go Demo API Server
-// @version 1.2.2
+// @version 1.2.3
 // @description ## 摘要
 // @description 可用來做為 GO API Server 教學展示或 API 服務基礎模板
 // @description ## Swagger API 認證
