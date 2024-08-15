@@ -8,7 +8,7 @@ import (
 	"github.com/NovanHsiu/go-demo-api-server/internal/app"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/constant"
-	"github.com/NovanHsiu/go-demo-api-server/internal/router/controller/parameter"
+	"github.com/NovanHsiu/go-demo-api-server/internal/domain/parameter"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
