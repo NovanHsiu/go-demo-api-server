@@ -32,7 +32,7 @@ import (
 func main() {
 	if len(os.Args) > 1 {
 		if os.Args[1] == "version" {
-			fmt.Println("version 1.2.2")
+			fmt.Println("version 1.2.4")
 			return
 		}
 	}

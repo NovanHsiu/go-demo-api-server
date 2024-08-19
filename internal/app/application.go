@@ -4,16 +4,20 @@ import (
 	"context"
 	"time"
 
+	"github.com/gin-contrib/sessions"
+	gormsessions "github.com/gin-contrib/sessions/gorm"
+
 	adapterGorm "github.com/NovanHsiu/go-demo-api-server/internal/adapter/repository/gorm"
+	"github.com/NovanHsiu/go-demo-api-server/internal/app/service/user"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
 	"github.com/patrickmn/go-cache"
-	"gorm.io/gorm"
 )
 
 type Application struct {
 	ApplicationParams ApplicationParams
-	DB                *gorm.DB
 	Cache             *ApplicationCache
+	SessionsStore     sessions.Store
+	UserService       *user.UserService
 }
 
 type ApplicationParams struct {
@@ -32,12 +36,19 @@ func NewApplication(ctx context.Context, params ApplicationParams) (*Application
 	}
 	adapterGorm.CreateDefaultTable(db)
 	tokenCache := cache.New(10*time.Minute, 20*time.Minute)
+	// "yoursecretpassowrd" is password for encoding
+	sessionsStore := gormsessions.NewStore(db, true, []byte("yoursecretpassowrd"))
+	repo := adapterGorm.NewGormRepository(ctx, db)
+	userService := user.NewUserService(user.UserServiceParam{
+		UserRepo: repo,
+	})
 	app := Application{
 		ApplicationParams: params,
-		DB:                db,
 		Cache: &ApplicationCache{
 			SessionTokenCache: tokenCache,
 		},
+		SessionsStore: sessionsStore,
+		UserService:   userService,
 	}
 	return &app, nil
 }

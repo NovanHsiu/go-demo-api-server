@@ -1,4 +1,4 @@
-package middleware
+package router
 
 import "github.com/NovanHsiu/go-demo-api-server/internal/app"
 

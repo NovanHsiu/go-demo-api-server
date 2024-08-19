@@ -1,9 +1,8 @@
-package middleware
+package router
 
 import (
-	"net/http"
+	"fmt"
 
-	"github.com/NovanHsiu/go-demo-api-server/internal/adapter/repository/gorm/model"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/constant"
 	"github.com/gin-gonic/gin"
@@ -12,10 +11,14 @@ import (
 func (m *Middleware) AdminOnly() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID := c.GetString(constant.UserIDKey)
-		user := model.User{}
-		m.App.DB.Where("id=?", userID).Preload("UserRole").Last(&user)
+		user, err := m.App.UserService.GetUser(c.Request.Context(), userID)
+		if err != nil {
+			respondWithError(c, err)
+			c.Abort()
+			return
+		}
 		if user.UserRole.Code != 1 {
-			c.JSON(http.StatusForbidden, common.GetResponseObject(40301, "no permission"))
+			respondWithError(c, common.NewError(common.ErrorCodeAuthPermissionDenied, fmt.Errorf("no permission")))
 			c.Abort()
 			return
 		}

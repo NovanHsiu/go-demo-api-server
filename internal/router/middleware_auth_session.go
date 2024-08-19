@@ -1,7 +1,7 @@
-package middleware
+package router
 
 import (
-	"net/http"
+	"fmt"
 	"time"
 
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
@@ -23,7 +23,7 @@ func (m *Middleware) AuthSessionToken() gin.HandlerFunc {
 			}
 		}
 		if token == nil {
-			c.JSON(http.StatusUnauthorized, common.GetResponseObject(40101, "token undefined"))
+			respondWithError(c, common.NewError(common.ErrorCodeAuthNotAuthenticated, fmt.Errorf("token undefined")))
 			c.Abort()
 			return
 		}

@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -13,6 +14,14 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
+
+type GormRepository struct {
+	db *gorm.DB
+}
+
+func NewGormRepository(ctx context.Context, db *gorm.DB) *GormRepository {
+	return &GormRepository{db: db}
+}
 
 func NewDB(dbConfig common.ConfigDB) (*gorm.DB, error) {
 	host := dbConfig.Host

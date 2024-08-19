@@ -6,10 +6,7 @@ import (
 	_ "github.com/NovanHsiu/go-demo-api-server/docs"
 	"github.com/NovanHsiu/go-demo-api-server/internal/app"
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/common"
-	"github.com/NovanHsiu/go-demo-api-server/internal/router/controller"
-	"github.com/NovanHsiu/go-demo-api-server/internal/router/middleware"
 	"github.com/gin-contrib/sessions"
-	gormsessions "github.com/gin-contrib/sessions/gorm"
 	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
@@ -26,36 +23,34 @@ func GetRouterEngine(app *app.Application) *gin.Engine {
 	cconfig.AllowCredentials = true
 	cconfig.AllowedHeaders = append(cconfig.AllowedHeaders, []string{"Authorization"}...)
 	eng.Use(cors.New(cconfig))
-	// "yoursecretpassowrd" is password for encoding
-	store := gormsessions.NewStore(app.DB, true, []byte("yoursecretpassowrd"))
 	// set session middleware "mysession" is session and cookie name
 	// store is storage engine, we can use redis or another db to store session
-	eng.Use(sessions.Sessions("api-server-session", store))
+	eng.Use(sessions.Sessions("api-server-session", app.SessionsStore))
 
 	// set swagger url
 	eng.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler)) // api-docs/index.html
 
 	// init middleware
-	mid := middleware.Middleware{App: app}
+	middleware := Middleware{App: app}
 	// set route
 	config := app.ApplicationParams.Config
 	os.Mkdir(common.GetExecutionDir()+"/"+config.File.StaticFileDir, os.ModePerm)
 	eng.Use(static.Serve("/static", static.LocalFile(config.File.StaticFileDir, true)))
 	apiGroup := eng.Group("/api")
 	// /users
-	user := controller.UserController{App: app}
+	user := UserController{App: app}
 	userGroup := apiGroup.Group("/users")
 	{
 		// no restriction
 		userGroup.POST("/login", user.LogIn)
 		// authorized by token
-		userGroup.Use(mid.AuthSessionToken())
+		userGroup.Use(middleware.AuthSessionToken())
 		userGroup.DELETE("/logout", user.LogOut)
 		userGroup.GET("/personalProfile", user.GetUserProfile)
 		userGroup.PUT("/personalProfile", user.ModifyUserProfile)
 		userGroup.PUT("/personalProfile/password", user.ModifyUserProfilePassword)
 		// admin only
-		userGroup.Use(mid.AuthSessionToken()).Use(mid.AdminOnly())
+		userGroup.Use(middleware.AuthSessionToken()).Use(middleware.AdminOnly())
 		userGroup.POST("/", user.AddUser)
 		userGroup.GET("/", user.GetUserList)
 		userGroup.GET("/:id", user.GetUser)
