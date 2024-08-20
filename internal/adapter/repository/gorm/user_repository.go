@@ -32,12 +32,12 @@ func (r *GormRepository) GetUserAndPasswordByAccount(ctx context.Context, accoun
 	return &resp, user.Password, nil
 }
 
-func (r *GormRepository) GetUsersByParams(ctx context.Context, params parameter.GetUserList) ([]response.UserResponseListItem, int, common.Error) {
+func (r *GormRepository) GetUsersByParam(ctx context.Context, param parameter.GetUserList) ([]response.UserResponseListItem, int, common.Error) {
 	// set filter
 	filterMap := map[string]string{
-		"account": params.Account,
-		"name":    params.Name,
-		"email":   params.Email,
+		"account": param.Account,
+		"name":    param.Name,
+		"email":   param.Email,
 	}
 	db := r.db
 	for key, value := range filterMap {
@@ -45,24 +45,24 @@ func (r *GormRepository) GetUsersByParams(ctx context.Context, params parameter.
 			db = db.Where(key+" like ?", "%"+value+"%")
 		}
 	}
-	if params.UserRoleName != "" {
-		db = db.Joins("inner join user_roles on user_roles.id=users.user_role_id and user_roles.name like ?", "%"+params.UserRoleName+"%")
+	if param.UserRoleName != "" {
+		db = db.Joins("inner join user_roles on user_roles.id=users.user_role_id and user_roles.name like ?", "%"+param.UserRoleName+"%")
 	}
 	// set order
-	if params.OrderBy == "" {
-		db = db.Order("users.id " + params.Order)
+	if param.OrderBy == "" {
+		db = db.Order("users.id " + param.Order)
 	} else {
-		db = db.Order("users." + params.OrderBy + " " + params.Order)
+		db = db.Order("users." + param.OrderBy + " " + param.Order)
 	}
 	// set pagination
 	userList := []model.User{}
-	if params.PageNumber == 0 {
-		params.PageNumber = 1
+	if param.PageNumber == 0 {
+		param.PageNumber = 1
 	}
-	if params.PageSize == 0 {
-		params.PageSize = 10
+	if param.PageSize == 0 {
+		param.PageSize = 10
 	}
-	db.Offset(params.Page.GetOffset()).Limit(params.PageSize).Preload("UserRole").Find(&userList)
+	db.Offset(param.Page.GetOffset()).Limit(param.PageSize).Preload("UserRole").Find(&userList)
 	data := []response.UserResponseListItem{}
 	for _, user := range userList {
 		data = append(data, user.GetResponse())
@@ -70,29 +70,29 @@ func (r *GormRepository) GetUsersByParams(ctx context.Context, params parameter.
 	// get pages
 	var count int64
 	db.Model(&model.User{}).Count(&count)
-	return data, params.Page.GetPages(int(count)), nil
+	return data, param.Page.GetPages(int(count)), nil
 }
 
-func (r *GormRepository) CreateUserByParams(ctx context.Context, params parameter.AddUser) (*response.UserResponseListItem, common.Error) {
+func (r *GormRepository) CreateUserByParam(ctx context.Context, param parameter.AddUser) (*response.UserResponseListItem, common.Error) {
 	// check password and password2
-	if params.Password != params.Password2 {
+	if param.Password != param.Password2 {
 		return nil, common.NewError(common.ErrorCodeParameterInvalid, fmt.Errorf("password and password2 do not match"))
 	}
 	// check account exists or not
 	var count int64
-	if r.db.Model(&model.User{}).Where("account=?", params.Account).Count(&count); count > 0 {
+	if r.db.Model(&model.User{}).Where("account=?", param.Account).Count(&count); count > 0 {
 		return nil, common.NewError(common.ErrorCodeParameterInvalid, fmt.Errorf("this account is existed"))
 	}
 	// check user role
 	userRole := model.UserRole{}
-	if r.db.Where("name=?", params.UserRoleName).Last(&userRole); userRole.ID == 0 {
+	if r.db.Where("name=?", param.UserRoleName).Last(&userRole); userRole.ID == 0 {
 		return nil, common.NewError(common.ErrorCodeParameterInvalid, fmt.Errorf("userRoleName not found"))
 	}
 	user := model.User{
-		Account:    params.Account,
-		Password:   common.Cipher.EncodePassword(params.Password),
-		Name:       params.Name,
-		Email:      params.Email,
+		Account:    param.Account,
+		Password:   common.Cipher.EncodePassword(param.Password),
+		Name:       param.Name,
+		Email:      param.Email,
 		UserRoleID: userRole.ID,
 	}
 	if err := r.db.Create(&user).Error; err != nil {
@@ -102,13 +102,13 @@ func (r *GormRepository) CreateUserByParams(ctx context.Context, params paramete
 	return &resp, nil
 }
 
-func (r *GormRepository) UpdateUserByIDnParams(ctx context.Context, id string, params parameter.ModifyUser) common.Error {
+func (r *GormRepository) UpdateUserByIDnParam(ctx context.Context, id string, param parameter.ModifyUser) common.Error {
 	// set update map
-	updateMap := params.ModifyPersonalProfile.GetUpdateMap()
+	updateMap := param.ModifyPersonalProfile.GetUpdateMap()
 	userRole := model.UserRole{}
-	if params.UserRoleName != "" {
-		if r.db.Where("name=?", params.UserRoleName).Last(&userRole); userRole.ID == 0 {
-			return common.NewError(common.ErrorCodeParameterInvalid, fmt.Errorf("user_role.name='%s' not found", params.UserRoleName))
+	if param.UserRoleName != "" {
+		if r.db.Where("name=?", param.UserRoleName).Last(&userRole); userRole.ID == 0 {
+			return common.NewError(common.ErrorCodeParameterInvalid, fmt.Errorf("user_role.name='%s' not found", param.UserRoleName))
 		}
 		updateMap["user_role_id"] = userRole.ID
 	}
@@ -118,16 +118,16 @@ func (r *GormRepository) UpdateUserByIDnParams(ctx context.Context, id string, p
 	return nil
 }
 
-func (r *GormRepository) UpdateUserPasswordByIDnParams(ctx context.Context, id string, params parameter.ModifyUserPassword) common.Error {
+func (r *GormRepository) UpdateUserPasswordByIDnParam(ctx context.Context, id string, param parameter.ModifyUserPassword) common.Error {
 	user := model.User{}
 	if r.db.Where("id=?", id).Last(&user); user.ID == 0 {
 		return common.NewError(common.ErrorCodeResourceNotFound, fmt.Errorf("user not found"))
 	}
 	// check old passowrd is correct
-	if !common.Cipher.ComparePassword(user.Password, params.OldPassword) {
+	if !common.Cipher.ComparePassword(user.Password, param.OldPassword) {
 		return common.NewError(common.ErrorCodeParameterInvalid, fmt.Errorf("incorrected old password"))
 	}
-	if err := r.db.Model(&model.User{}).Where("id=?", id).Update("password", common.Cipher.EncodePassword(params.NewPassword2)).Error; err != nil {
+	if err := r.db.Model(&model.User{}).Where("id=?", id).Update("password", common.Cipher.EncodePassword(param.NewPassword2)).Error; err != nil {
 		return common.NewError(common.ErrorCodeRemoteProcess, err)
 	}
 	return nil

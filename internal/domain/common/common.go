@@ -88,15 +88,15 @@ func ArrayIncludeString(sl []string, v string, islike bool) bool {
 	return false
 }
 
-// SetRequestBodyParams turn c.Request.Body ReaderCloser to params map[string]interface{}
-func SetRequestBodyParams(body io.ReadCloser) (map[string]interface{}, error) {
+// SetRequestBodyParam turn c.Request.Body ReaderCloser to param map[string]interface{}
+func SetRequestBodyParam(body io.ReadCloser) (map[string]interface{}, error) {
 	bodyBytes, _ := ioutil.ReadAll(body)
-	params := make(map[string]interface{})
-	err := json.Unmarshal(bodyBytes, &params)
+	param := make(map[string]interface{})
+	err := json.Unmarshal(bodyBytes, &param)
 	if err != nil {
 		fmt.Println("error:", err)
 	}
-	return params, err
+	return param, err
 }
 
 // GetMimeType get mimetype of file from *gin.Context.ContentType()

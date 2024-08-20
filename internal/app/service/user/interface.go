@@ -8,13 +8,13 @@ import (
 	"github.com/NovanHsiu/go-demo-api-server/internal/domain/response"
 )
 
-//go:generate mockgen -destination automock/good_repository.go -package=automock . GoodRepository
+//go:generate mockgen -destination automock/user_repository.go -package=automock . UserRepository
 type UserRepository interface {
 	GetUserByID(ctx context.Context, id string) (*response.UserResponseListItem, common.Error)
 	GetUserAndPasswordByAccount(ctx context.Context, account string) (*response.UserResponseListItem, string, common.Error)
-	GetUsersByParams(ctx context.Context, params parameter.GetUserList) ([]response.UserResponseListItem, int, common.Error)
-	CreateUserByParams(ctx context.Context, params parameter.AddUser) (*response.UserResponseListItem, common.Error)
-	UpdateUserByIDnParams(ctx context.Context, id string, params parameter.ModifyUser) common.Error
-	UpdateUserPasswordByIDnParams(ctx context.Context, id string, params parameter.ModifyUserPassword) common.Error
+	GetUsersByParam(ctx context.Context, param parameter.GetUserList) ([]response.UserResponseListItem, int, common.Error)
+	CreateUserByParam(ctx context.Context, param parameter.AddUser) (*response.UserResponseListItem, common.Error)
+	UpdateUserByIDnParam(ctx context.Context, id string, param parameter.ModifyUser) common.Error
+	UpdateUserPasswordByIDnParam(ctx context.Context, id string, param parameter.ModifyUserPassword) common.Error
 	DeleteUserByID(ctx context.Context, id string) common.Error
 }

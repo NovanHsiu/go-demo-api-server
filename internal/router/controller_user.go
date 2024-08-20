@@ -27,12 +27,12 @@ type UserController struct {
 // @Router /users/login [post]
 // LogIn login user's account
 func (uc *UserController) LogIn(c *gin.Context) {
-	params := parameter.Login{}
-	if err := c.ShouldBind(&params); err != nil {
+	param := parameter.Login{}
+	if err := c.ShouldBind(&param); err != nil {
 		respondWithError(c, common.NewError(common.ErrorCodeParameterInvalid, err))
 		return
 	}
-	user, err := uc.App.UserService.Login(c.Request.Context(), params)
+	user, err := uc.App.UserService.Login(c.Request.Context(), param)
 	if err != nil {
 		respondWithError(c, err)
 		return
@@ -91,12 +91,12 @@ func (uc *UserController) GetUserProfile(c *gin.Context) {
 // @Router  /users [post]
 // AddUser add user
 func (uc *UserController) AddUser(c *gin.Context) {
-	params := parameter.AddUser{}
-	if err := c.ShouldBind(&params); err != nil {
+	param := parameter.AddUser{}
+	if err := c.ShouldBind(&param); err != nil {
 		respondWithError(c, common.NewError(common.ErrorCodeParameterInvalid, err))
 		return
 	}
-	user, err := uc.App.UserService.CreateUser(c.Request.Context(), params)
+	user, err := uc.App.UserService.CreateUser(c.Request.Context(), param)
 	if err != nil {
 		respondWithError(c, err)
 		return
@@ -115,12 +115,12 @@ func (uc *UserController) AddUser(c *gin.Context) {
 // @Router /users [get]
 // GetUserList get a list of user's data
 func (uc *UserController) GetUserList(c *gin.Context) {
-	params := parameter.GetUserList{}
-	if err := c.ShouldBind(&params); err != nil {
+	param := parameter.GetUserList{}
+	if err := c.ShouldBind(&param); err != nil {
 		respondWithError(c, common.NewError(common.ErrorCodeParameterInvalid, err))
 		return
 	}
-	userList, pages, err := uc.App.UserService.GetUserList(c.Request.Context(), params)
+	userList, pages, err := uc.App.UserService.GetUserList(c.Request.Context(), param)
 	if err != nil {
 		respondWithError(c, err)
 		return
@@ -157,12 +157,12 @@ func (uc *UserController) GetUser(c *gin.Context) {
 // @Router /users/{id} [put]
 // ModifyUser modify specificed user's profile
 func (uc *UserController) ModifyUser(c *gin.Context) {
-	params := parameter.ModifyUser{}
-	if err := c.ShouldBind(&params); err != nil {
+	param := parameter.ModifyUser{}
+	if err := c.ShouldBind(&param); err != nil {
 		respondWithError(c, common.NewError(common.ErrorCodeParameterInvalid, err))
 		return
 	}
-	if err := uc.App.UserService.UpdateUser(c.Request.Context(), c.Param("id"), params); err != nil {
+	if err := uc.App.UserService.UpdateUser(c.Request.Context(), c.Param("id"), param); err != nil {
 		respondWithError(c, err)
 		return
 	}
@@ -180,12 +180,12 @@ func (uc *UserController) ModifyUser(c *gin.Context) {
 // @Router /users/{id}/password [put]
 // ModifyUserPassword modify specificed user's password
 func (uc *UserController) ModifyUserPassword(c *gin.Context) {
-	params := parameter.ModifyUserPassword{}
-	if err := c.ShouldBind(&params); err != nil {
+	param := parameter.ModifyUserPassword{}
+	if err := c.ShouldBind(&param); err != nil {
 		respondWithError(c, common.NewError(common.ErrorCodeParameterInvalid, err))
 		return
 	}
-	if err := uc.App.UserService.UpdateUserPasswordByIDnParams(c.Request.Context(), c.Param("id"), params); err != nil {
+	if err := uc.App.UserService.UpdateUserPasswordByIDnParam(c.Request.Context(), c.Param("id"), param); err != nil {
 		respondWithError(c, err)
 		return
 	}
@@ -219,14 +219,14 @@ func (uc *UserController) DeleteUser(c *gin.Context) {
 // @Router /users/personalProfile [put]
 // ModifyUserProfile modify user's profile
 func (uc *UserController) ModifyUserProfile(c *gin.Context) {
-	params := parameter.ModifyPersonalProfile{}
-	if err := c.ShouldBind(&params); err != nil {
+	param := parameter.ModifyPersonalProfile{}
+	if err := c.ShouldBind(&param); err != nil {
 		respondWithError(c, common.NewError(common.ErrorCodeParameterInvalid, err))
 		return
 	}
 	userID := c.GetString(constant.UserIDKey)
 	if err := uc.App.UserService.UpdateUser(c.Request.Context(), userID, parameter.ModifyUser{
-		ModifyPersonalProfile: params,
+		ModifyPersonalProfile: param,
 	}); err != nil {
 		respondWithError(c, err)
 		return
@@ -244,13 +244,13 @@ func (uc *UserController) ModifyUserProfile(c *gin.Context) {
 // @Router /users/personalProfile/password [put]
 // ModifyUserPassword modify specificed user's password
 func (uc *UserController) ModifyUserProfilePassword(c *gin.Context) {
-	params := parameter.ModifyUserPassword{}
-	if err := c.ShouldBind(&params); err != nil {
+	param := parameter.ModifyUserPassword{}
+	if err := c.ShouldBind(&param); err != nil {
 		respondWithError(c, common.NewError(common.ErrorCodeParameterInvalid, err))
 		return
 	}
 	userID := c.GetString(constant.UserIDKey)
-	if err := uc.App.UserService.UpdateUserPasswordByIDnParams(c.Request.Context(), userID, params); err != nil {
+	if err := uc.App.UserService.UpdateUserPasswordByIDnParam(c.Request.Context(), userID, param); err != nil {
 		respondWithError(c, err)
 		return
 	}

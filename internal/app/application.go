@@ -14,13 +14,13 @@ import (
 )
 
 type Application struct {
-	ApplicationParams ApplicationParams
-	Cache             *ApplicationCache
-	SessionsStore     sessions.Store
-	UserService       *user.UserService
+	ApplicationParam ApplicationParam
+	Cache            *ApplicationCache
+	SessionsStore    sessions.Store
+	UserService      *user.UserService
 }
 
-type ApplicationParams struct {
+type ApplicationParam struct {
 	Config common.Config
 }
 
@@ -28,9 +28,9 @@ type ApplicationCache struct {
 	SessionTokenCache *cache.Cache
 }
 
-func NewApplication(ctx context.Context, params ApplicationParams) (*Application, error) {
+func NewApplication(ctx context.Context, param ApplicationParam) (*Application, error) {
 	// set db
-	db, err := adapterGorm.NewDB(params.Config.DB)
+	db, err := adapterGorm.NewDB(param.Config.DB)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func NewApplication(ctx context.Context, params ApplicationParams) (*Application
 		UserRepo: repo,
 	})
 	app := Application{
-		ApplicationParams: params,
+		ApplicationParam: param,
 		Cache: &ApplicationCache{
 			SessionTokenCache: tokenCache,
 		},

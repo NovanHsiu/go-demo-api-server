@@ -33,7 +33,7 @@ func GetRouterEngine(app *app.Application) *gin.Engine {
 	// init middleware
 	middleware := Middleware{App: app}
 	// set route
-	config := app.ApplicationParams.Config
+	config := app.ApplicationParam.Config
 	os.Mkdir(common.GetExecutionDir()+"/"+config.File.StaticFileDir, os.ModePerm)
 	eng.Use(static.Serve("/static", static.LocalFile(config.File.StaticFileDir, true)))
 	apiGroup := eng.Group("/api")

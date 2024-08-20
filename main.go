@@ -11,7 +11,7 @@ import (
 )
 
 // @title Go Demo API Server
-// @version 1.3.0
+// @version 1.3.1
 // @description ## 摘要
 // @description 可用來做為 GO API Server 教學展示或 API 服務基礎模板
 // @description ## Swagger API 認證
@@ -32,13 +32,13 @@ import (
 func main() {
 	if len(os.Args) > 1 {
 		if os.Args[1] == "version" {
-			fmt.Println("version 1.3.0")
+			fmt.Println("version 1.3.1")
 			return
 		}
 	}
 	//log.SetOutput(os.Stdout)
 	config := common.GetConfig()
-	app, err := app.NewApplication(context.Background(), app.ApplicationParams{
+	app, err := app.NewApplication(context.Background(), app.ApplicationParam{
 		Config: config,
 	})
 	if err != nil {
