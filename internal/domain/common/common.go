@@ -19,49 +19,10 @@ import (
 	uCipher "github.com/NovanHsiu/go-demo-api-server/internal/domain/cipher"
 )
 
-// TimeLayout used to time.parse
-const TimeLayout = "2006-01-02 15:04:05"
 const randomText = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 var Cipher = uCipher.NewCipher(24, 11, "This is a private key!")
 var ImageExtName = []string{".jpg", ".jpeg", ".png", ".bmp", ".gif"}
-
-// SQLTimeFormatToString turn time to sql format time in string
-func SQLTimeFormatToString(t time.Time) string {
-	return fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
-}
-
-// SQLTimeStringToTime turn sql fromat time string to time type
-func SQLTimeStringToTime(t string) (time.Time, error) {
-	_, offset := time.Now().Zone()
-	offsetSecond, _ := time.ParseDuration(fmt.Sprintf("%ds", offset))
-	ctime, err := time.Parse(TimeLayout, t)
-	if err != nil {
-		return ctime, err
-	}
-	return ctime.Add(-offsetSecond), nil
-}
-
-// TimeStamptoTime convert timestamp string to time
-func TimeStamptoTime(timeStampStr string) (time.Time, error) {
-	timeStampInt, err := strconv.ParseInt(timeStampStr, 10, 64)
-	return time.Unix(timeStampInt/1000, (timeStampInt%1000)*1000000), err
-}
-
-// GetFormatTimeString set time to fomrat string
-// example:
-// - input: (time.Now(),"YYYY-MM-DD hh:mm:ss")
-// - output: "2019-10-17 15:30:46"
-func GetFormatTimeString(t time.Time, format string) string {
-	timestring := format
-	timestring = strings.ReplaceAll(timestring, "YYYY", fmt.Sprintf("%04d", t.Year()))
-	timestring = strings.ReplaceAll(timestring, "MM", fmt.Sprintf("%02d", t.Month()))
-	timestring = strings.ReplaceAll(timestring, "DD", fmt.Sprintf("%02d", t.Day()))
-	timestring = strings.ReplaceAll(timestring, "hh", fmt.Sprintf("%02d", t.Hour()))
-	timestring = strings.ReplaceAll(timestring, "mm", fmt.Sprintf("%02d", t.Minute()))
-	timestring = strings.ReplaceAll(timestring, "ss", fmt.Sprintf("%02d", t.Second()))
-	return timestring
-}
 
 // ContainsString Contains find element slice contains the element or not
 func ContainsString(sl []string, v string) bool {
@@ -138,14 +99,6 @@ func GetRandomTempDirName(basePath string, length int) (rndtxt string) {
 	return basePath + "/" + rndtxt
 }
 
-// PadLeft add pad string to the left of main string
-func PadLeft(str, pad string, length int) string {
-	for i := 0; i < length; i++ {
-		str = pad + str
-	}
-	return str
-}
-
 // CopyFile copy a file from source to destination path
 func CopyFile(src, dst string) error {
 	from, err := os.Open(src)
@@ -163,21 +116,6 @@ func CopyFile(src, dst string) error {
 		return err
 	}
 	return nil
-}
-
-func RemoveSuffixVersion(name string) string {
-	eindex := strings.LastIndex(name, "v")
-	if eindex <= 0 {
-		return name
-	}
-	_, err := strconv.Atoi(name[eindex+1:])
-	if err != nil {
-		return name
-	}
-	if name[eindex-1] == ' ' || name[eindex-1] == '-' || name[eindex-1] == '_' {
-		eindex--
-	}
-	return name[:eindex]
 }
 
 // MatchDatePattern check date string is match pattern "YYYY-MM-DD"，ex:"2015-11-26"
