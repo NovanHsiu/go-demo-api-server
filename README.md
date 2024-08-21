@@ -60,6 +60,14 @@ build/demo-server-api.exe
 檔案相關設定
 - static_file_dir: 靜態檔案儲存路徑
 
+# gomock
+## 安裝 mockgen
+1. 確認環境變數 `PATH` 有加入路徑 `$GOPATH/bin`，方可在終端機執行
+2. 輸入指令安裝 gomock `go install github.com/golang/mock/mockgen@v1.6.0`
+
+## 產生 mock repository code
+1. 執行 internal/app/service interface 的 go:generate 註解產生 mock code，範例: `mockgen -destination automock/user_repository.go -package=automock . UserRepository`
+
 # 模組使用方法說明
 - [gin](https://github.com/gin-gonic/gin/blob/master/docs/doc.md): Gin Quick Start 文件，包含: Parameter usage, Upload files, Grouping routes, Model binding and validation 等重點功能使用方法與範例說明
 - [gorm](https://gorm.io/docs/index.html): Gorm Quick Start
