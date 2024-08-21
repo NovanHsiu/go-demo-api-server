@@ -1,10 +1,8 @@
 package common
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"os"
@@ -180,30 +178,4 @@ func IsImage(filename string) bool {
 		}
 	}
 	return false
-}
-
-func ReadJSONConfig(path string) (map[string]interface{}, error) {
-	dir := GetExecutionDir()
-	data, err := ioutil.ReadFile(dir + "/" + path)
-	if err != nil {
-		return nil, err
-	}
-	jsonMap := make(map[string]interface{})
-	err = json.Unmarshal([]byte(string(data)), &jsonMap)
-	if err != nil {
-		return nil, err
-	}
-	return jsonMap, nil
-}
-
-func WriteJSONConfig(path string, jsonMap map[string]interface{}) error {
-	jsonBytes, err := json.MarshalIndent(jsonMap, "", "    ")
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(path, jsonBytes, 0644)
-	if err != nil {
-		return err
-	}
-	return nil
 }
