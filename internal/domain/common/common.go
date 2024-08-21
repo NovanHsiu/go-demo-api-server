@@ -25,48 +25,28 @@ var Cipher = uCipher.NewCipher(24, 11, "This is a private key!")
 var ImageExtName = []string{".jpg", ".jpeg", ".png", ".bmp", ".gif"}
 
 // ContainsString Contains find element slice contains the element or not
-func ContainsString(sl []string, v string) bool {
-	return ArrayIncludeString(sl, v, true)
+func ArrayContainsString(sl []string, v string) bool {
+	return matchArrayString(sl, v, true)
 }
 
-// HasString find the same string in array
-func HasString(sl []string, v string) bool {
-	return ArrayIncludeString(sl, v, false)
+// HasString find the exactly same string in array
+func ArrayHasString(sl []string, v string) bool {
+	return matchArrayString(sl, v, false)
 }
 
-func ArrayIncludeString(sl []string, v string, islike bool) bool {
+func matchArrayString(sl []string, v string, isExact bool) bool {
 	for _, vv := range sl {
-		if islike {
-			if strings.Contains(v, vv) {
+		if isExact {
+			if v == vv {
 				return true
 			}
 		} else {
-			if v == vv {
+			if strings.Contains(v, vv) {
 				return true
 			}
 		}
 	}
 	return false
-}
-
-// SetRequestBodyParam turn c.Request.Body ReaderCloser to param map[string]interface{}
-func SetRequestBodyParam(body io.ReadCloser) (map[string]interface{}, error) {
-	bodyBytes, _ := ioutil.ReadAll(body)
-	param := make(map[string]interface{})
-	err := json.Unmarshal(bodyBytes, &param)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	return param, err
-}
-
-// GetMimeType get mimetype of file from *gin.Context.ContentType()
-// example format of contentType: Content-Type:[text/plain]] multipart/form-data
-func GetMimeType(contentType string) string {
-	if !strings.Contains(contentType, "[") {
-		return ""
-	}
-	return contentType[strings.Index(contentType, "[")+1 : strings.Index(contentType, "]")]
 }
 
 func GetExecutionDir() string {
