@@ -23,23 +23,23 @@ var Cipher = uCipher.NewCipher(24, 11, "This is a private key!")
 var ImageExtName = []string{".jpg", ".jpeg", ".png", ".bmp", ".gif"}
 
 // ContainsString Contains find element slice contains the element or not
-func ArrayContainsString(sl []string, v string) bool {
-	return matchArrayString(sl, v, true)
+func ArrayContainsString(arr []string, v string) bool {
+	return matchArrayString(arr, v, false)
 }
 
 // HasString find the exactly same string in array
-func ArrayHasString(sl []string, v string) bool {
-	return matchArrayString(sl, v, false)
+func ArrayHasString(arr []string, v string) bool {
+	return matchArrayString(arr, v, true)
 }
 
-func matchArrayString(sl []string, v string, isExact bool) bool {
-	for _, vv := range sl {
+func matchArrayString(arr []string, v string, isExact bool) bool {
+	for _, arrv := range arr {
 		if isExact {
-			if v == vv {
+			if v == arrv {
 				return true
 			}
 		} else {
-			if strings.Contains(v, vv) {
+			if strings.Contains(arrv, v) {
 				return true
 			}
 		}
